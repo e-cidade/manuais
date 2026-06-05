@@ -248,12 +248,14 @@ def convert_pdf(doc: Document) -> None:
     <style>
       :root {
         color-scheme: light;
-        --bg: #f3efe6;
-        --panel: rgba(255, 255, 255, 0.88);
-        --text: #24201c;
-        --muted: #6a6258;
-        --accent: #8c5f2b;
-        --border: rgba(36, 32, 28, 0.12);
+        --bg: #eef8f2;
+        --panel: rgba(255, 255, 255, 0.9);
+        --text: #173126;
+        --muted: #557063;
+        --accent: #1f7745;
+        --accent-2: #23b0dd;
+        --accent-3: #ffcb1f;
+        --border: rgba(31, 119, 69, 0.14);
       }
       body.pdf-body {
         margin: 0;
@@ -261,9 +263,9 @@ def convert_pdf(doc: Document) -> None:
         font-family: Georgia, "Times New Roman", Times, serif;
         color: var(--text);
         background:
-          radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 30%),
-          radial-gradient(circle at 85% 15%, rgba(140, 95, 43, 0.16), transparent 28%),
-          linear-gradient(180deg, var(--bg) 0%, #f7f5ef 45%, #e7ece4 100%);
+          radial-gradient(circle at top left, rgba(255, 203, 31, 0.16), transparent 28%),
+          radial-gradient(circle at 85% 15%, rgba(35, 176, 221, 0.16), transparent 28%),
+          linear-gradient(180deg, var(--bg) 0%, #f8fbfd 48%, #edf7ef 100%);
       }
       .pdf-shell {
         max-width: 1180px;
@@ -309,7 +311,7 @@ def convert_pdf(doc: Document) -> None:
         overflow: hidden;
         border-radius: 18px;
         border: 1px solid var(--border);
-        box-shadow: 0 18px 48px rgba(52, 38, 20, 0.12);
+        box-shadow: 0 18px 48px rgba(31, 119, 69, 0.12);
         background: #fff;
       }
       .pdf-pages > div[id^="page"] img {
@@ -543,12 +545,14 @@ def convert_odt(doc: Document) -> None:
     <style>
       :root {{
         color-scheme: light;
-        --bg: #f3efe6;
-        --panel: rgba(255, 255, 255, 0.84);
-        --text: #24201c;
-        --muted: #6a6258;
-        --accent: #8c5f2b;
-        --border: rgba(36, 32, 28, 0.12);
+        --bg: #eef8f2;
+        --panel: rgba(255, 255, 255, 0.9);
+        --text: #173126;
+        --muted: #557063;
+        --accent: #1f7745;
+        --accent-2: #23b0dd;
+        --accent-3: #ffcb1f;
+        --border: rgba(31, 119, 69, 0.14);
       }}
       * {{ box-sizing: border-box; }}
       body {{
@@ -556,7 +560,10 @@ def convert_odt(doc: Document) -> None:
         padding: 24px;
         font-family: Georgia, "Times New Roman", Times, serif;
         color: var(--text);
-        background: linear-gradient(180deg, #f7f2e9 0%, var(--bg) 100%);
+        background:
+          radial-gradient(circle at top left, rgba(255, 203, 31, 0.16), transparent 28%),
+          radial-gradient(circle at 85% 15%, rgba(35, 176, 221, 0.16), transparent 28%),
+          linear-gradient(180deg, var(--bg) 0%, #f8fbfd 48%, #edf7ef 100%);
       }}
       .page {{
         max-width: 960px;
@@ -564,7 +571,7 @@ def convert_odt(doc: Document) -> None:
         background: var(--panel);
         border: 1px solid var(--border);
         border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(52, 38, 20, 0.12);
+        box-shadow: 0 20px 60px rgba(31, 119, 69, 0.12);
         overflow: hidden;
       }}
       .topbar {{
@@ -574,7 +581,7 @@ def convert_odt(doc: Document) -> None:
         align-items: center;
         padding: 18px 22px;
         border-bottom: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.78);
       }}
       .topbar h1 {{
         margin: 0;
@@ -726,17 +733,19 @@ def render_index(documents: Iterable[Document]) -> str:
     <style>
       :root {{
         color-scheme: light;
-        --bg: #f1eadf;
-        --bg-accent: #e0e8dc;
-        --panel: rgba(255, 255, 255, 0.82);
-        --border: rgba(38, 52, 28, 0.12);
-        --text: #1f241d;
-        --muted: #667062;
-        --strong: #141a13;
-        --accent: #56733a;
-        --accent-soft: rgba(86, 115, 58, 0.12);
-        --accent-warm: rgba(166, 112, 52, 0.18);
-        --shadow: 0 22px 70px rgba(35, 49, 28, 0.12);
+        --bg: #eef8f2;
+        --bg-accent: #edf7ef;
+        --panel: rgba(255, 255, 255, 0.9);
+        --border: rgba(31, 119, 69, 0.14);
+        --text: #173126;
+        --muted: #557063;
+        --strong: #123126;
+        --accent: #1f7745;
+        --accent-2: #23b0dd;
+        --accent-3: #ffcb1f;
+        --accent-soft: rgba(31, 119, 69, 0.12);
+        --accent-warm: rgba(255, 203, 31, 0.2);
+        --shadow: 0 22px 70px rgba(31, 119, 69, 0.12);
         --radius-xl: 28px;
         --radius-lg: 20px;
         --radius-md: 14px;
@@ -748,9 +757,9 @@ def render_index(documents: Iterable[Document]) -> str:
         color: var(--text);
         font-family: Georgia, "Times New Roman", Times, serif;
         background:
-          radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 30%),
-          radial-gradient(circle at 85% 15%, rgba(166, 112, 52, 0.16), transparent 28%),
-          linear-gradient(180deg, var(--bg) 0%, #f8f6ef 42%, var(--bg-accent) 100%);
+          radial-gradient(circle at top left, rgba(255, 203, 31, 0.16), transparent 28%),
+          radial-gradient(circle at 85% 15%, rgba(35, 176, 221, 0.16), transparent 28%),
+          linear-gradient(180deg, var(--bg) 0%, #f8fbfd 42%, var(--bg-accent) 100%);
       }}
       a {{ color: inherit; text-decoration: none; }}
       .page-shell {{
@@ -805,8 +814,8 @@ def render_index(documents: Iterable[Document]) -> str:
       .stat {{
         border-radius: var(--radius-md);
         padding: 18px 18px 16px;
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(140, 95, 43, 0.14);
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(241, 248, 244, 0.96));
+        border: 1px solid rgba(31, 119, 69, 0.14);
       }}
       .hero-visual {{
         display: grid;
@@ -823,9 +832,9 @@ def render_index(documents: Iterable[Document]) -> str:
         display: block;
         overflow: hidden;
         border-radius: 24px;
-        border: 1px solid rgba(38, 52, 28, 0.12);
-        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245, 240, 227, 0.92));
-        box-shadow: 0 20px 48px rgba(35, 49, 28, 0.14);
+        border: 1px solid rgba(31, 119, 69, 0.16);
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(238, 248, 242, 0.92));
+        box-shadow: 0 20px 48px rgba(31, 119, 69, 0.14);
       }}
       .hero-frame-large {{
         min-height: 420px;
@@ -844,7 +853,7 @@ def render_index(documents: Iterable[Document]) -> str:
         inset: auto 0 0 0;
         padding: 18px 18px 16px;
         color: #fff;
-        background: linear-gradient(180deg, transparent 0%, rgba(18, 24, 16, 0.86) 100%);
+        background: linear-gradient(180deg, transparent 0%, rgba(18, 49, 38, 0.88) 100%);
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       }}
       .hero-caption span {{
@@ -865,15 +874,15 @@ def render_index(documents: Iterable[Document]) -> str:
       }}
       .hero-frame-placeholder {{
         background:
-          radial-gradient(circle at 28% 25%, rgba(86, 115, 58, 0.18), transparent 0 30%),
-          radial-gradient(circle at 72% 70%, rgba(166, 112, 52, 0.18), transparent 0 30%),
-          linear-gradient(160deg, rgba(255,255,255,0.9), rgba(233, 236, 224, 0.92));
+          radial-gradient(circle at 28% 25%, rgba(31, 119, 69, 0.18), transparent 0 30%),
+          radial-gradient(circle at 72% 70%, rgba(35, 176, 221, 0.18), transparent 0 30%),
+          linear-gradient(160deg, rgba(255,255,255,0.92), rgba(237, 247, 239, 0.92));
       }}
       .hero-frame-placeholder.alt {{
         background:
-          radial-gradient(circle at 72% 26%, rgba(86, 115, 58, 0.18), transparent 0 30%),
-          radial-gradient(circle at 24% 72%, rgba(166, 112, 52, 0.18), transparent 0 30%),
-          linear-gradient(160deg, rgba(255,255,255,0.9), rgba(234, 228, 216, 0.92));
+          radial-gradient(circle at 72% 26%, rgba(255, 203, 31, 0.22), transparent 0 30%),
+          radial-gradient(circle at 24% 72%, rgba(35, 176, 221, 0.18), transparent 0 30%),
+          linear-gradient(160deg, rgba(255,255,255,0.92), rgba(235, 244, 248, 0.92));
       }}
       .stat-value {{
         display: block;
