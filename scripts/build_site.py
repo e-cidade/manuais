@@ -179,6 +179,35 @@ def collect_style_flags(*roots: ET.Element) -> dict[str, StyleFlags]:
     return resolved
 
 
+def preview_image_for(doc: Document) -> Path | None:
+    candidates = sorted(doc.preview.parent.glob("*.png"))
+    if not candidates:
+        return None
+    return candidates[0]
+
+
+def feature_documents(documents: list[Document], limit: int = 3) -> list[Document]:
+    featured: list[Document] = []
+    preferred_groups = ["2018", "arquivos", "2014"]
+    for group in preferred_groups:
+        for doc in documents:
+            if doc.group != group or doc.ext != "pdf":
+                continue
+            if preview_image_for(doc) is None:
+                continue
+            featured.append(doc)
+            if len(featured) >= limit:
+                return featured
+    if len(featured) < limit:
+        for doc in documents:
+            if doc.ext != "pdf" or preview_image_for(doc) is None or doc in featured:
+                continue
+            featured.append(doc)
+            if len(featured) >= limit:
+                break
+    return featured
+
+
 def convert_pdf(doc: Document) -> None:
     output_dir = doc.preview.parent
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -600,6 +629,29 @@ def render_index(documents: Iterable[Document]) -> str:
     for group_docs in by_group.values():
         group_docs.sort(key=lambda item: item.title.lower())
 
+    featured_docs = feature_documents(documents, limit=3)
+    featured_cards: list[str] = []
+    for index, doc in enumerate(featured_docs):
+        image = preview_image_for(doc)
+        if image is None:
+            continue
+        featured_cards.append(
+            f"""
+          <a class="hero-frame {'hero-frame-large' if index == 0 else 'hero-frame-mini'}" href="{quote(doc.preview.relative_to(OUTPUT).as_posix(), safe='/')}">
+            <img src="{quote(image.relative_to(OUTPUT).as_posix(), safe='/')}" alt="{html.escape(doc.title)}" />
+            <div class="hero-caption">
+              <span>{html.escape(doc.group)}</span>
+              <strong>{html.escape(doc.title)}</strong>
+            </div>
+          </a>
+            """.strip()
+        )
+    if len(featured_cards) == 1:
+        featured_cards.append('<div class="hero-frame hero-frame-mini hero-frame-placeholder"></div>')
+        featured_cards.append('<div class="hero-frame hero-frame-mini hero-frame-placeholder alt"></div>')
+    elif len(featured_cards) == 2:
+        featured_cards.append('<div class="hero-frame hero-frame-mini hero-frame-placeholder"></div>')
+
     group_blocks: list[str] = []
     for group in SOURCE_GROUPS:
         group_docs = by_group.get(group, [])
@@ -659,16 +711,17 @@ def render_index(documents: Iterable[Document]) -> str:
     <style>
       :root {{
         color-scheme: light;
-        --bg: #f3efe6;
-        --bg-accent: #e7ece4;
-        --panel: rgba(255, 255, 255, 0.8);
-        --border: rgba(62, 55, 47, 0.12);
-        --text: #24201c;
-        --muted: #6a6258;
-        --strong: #171411;
-        --accent: #8c5f2b;
-        --accent-soft: rgba(140, 95, 43, 0.12);
-        --shadow: 0 22px 70px rgba(52, 38, 20, 0.12);
+        --bg: #f1eadf;
+        --bg-accent: #e0e8dc;
+        --panel: rgba(255, 255, 255, 0.82);
+        --border: rgba(38, 52, 28, 0.12);
+        --text: #1f241d;
+        --muted: #667062;
+        --strong: #141a13;
+        --accent: #56733a;
+        --accent-soft: rgba(86, 115, 58, 0.12);
+        --accent-warm: rgba(166, 112, 52, 0.18);
+        --shadow: 0 22px 70px rgba(35, 49, 28, 0.12);
         --radius-xl: 28px;
         --radius-lg: 20px;
         --radius-md: 14px;
@@ -681,8 +734,8 @@ def render_index(documents: Iterable[Document]) -> str:
         font-family: Georgia, "Times New Roman", Times, serif;
         background:
           radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 30%),
-          radial-gradient(circle at 85% 15%, rgba(140, 95, 43, 0.16), transparent 28%),
-          linear-gradient(180deg, var(--bg) 0%, #f7f5ef 45%, var(--bg-accent) 100%);
+          radial-gradient(circle at 85% 15%, rgba(166, 112, 52, 0.16), transparent 28%),
+          linear-gradient(180deg, var(--bg) 0%, #f8f6ef 42%, var(--bg-accent) 100%);
       }}
       a {{ color: inherit; text-decoration: none; }}
       .page-shell {{
@@ -697,6 +750,10 @@ def render_index(documents: Iterable[Document]) -> str:
         backdrop-filter: blur(18px);
       }}
       .hero {{
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 24px;
+        align-items: center;
         border-radius: var(--radius-xl);
         padding: 34px 32px 30px;
       }}
@@ -735,6 +792,73 @@ def render_index(documents: Iterable[Document]) -> str:
         padding: 18px 18px 16px;
         background: rgba(255, 255, 255, 0.72);
         border: 1px solid rgba(140, 95, 43, 0.14);
+      }}
+      .hero-visual {{
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 14px;
+        min-height: 420px;
+      }}
+      .hero-stack {{
+        display: grid;
+        gap: 14px;
+      }}
+      .hero-frame {{
+        position: relative;
+        display: block;
+        overflow: hidden;
+        border-radius: 24px;
+        border: 1px solid rgba(38, 52, 28, 0.12);
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245, 240, 227, 0.92));
+        box-shadow: 0 20px 48px rgba(35, 49, 28, 0.14);
+      }}
+      .hero-frame-large {{
+        min-height: 420px;
+      }}
+      .hero-frame-mini {{
+        min-height: 203px;
+      }}
+      .hero-frame img {{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }}
+      .hero-caption {{
+        position: absolute;
+        inset: auto 0 0 0;
+        padding: 18px 18px 16px;
+        color: #fff;
+        background: linear-gradient(180deg, transparent 0%, rgba(18, 24, 16, 0.86) 100%);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }}
+      .hero-caption span {{
+        display: inline-flex;
+        margin-bottom: 6px;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.15);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }}
+      .hero-caption strong {{
+        display: block;
+        font-size: 1rem;
+        line-height: 1.35;
+      }}
+      .hero-frame-placeholder {{
+        background:
+          radial-gradient(circle at 28% 25%, rgba(86, 115, 58, 0.18), transparent 0 30%),
+          radial-gradient(circle at 72% 70%, rgba(166, 112, 52, 0.18), transparent 0 30%),
+          linear-gradient(160deg, rgba(255,255,255,0.9), rgba(233, 236, 224, 0.92));
+      }}
+      .hero-frame-placeholder.alt {{
+        background:
+          radial-gradient(circle at 72% 26%, rgba(86, 115, 58, 0.18), transparent 0 30%),
+          radial-gradient(circle at 24% 72%, rgba(166, 112, 52, 0.18), transparent 0 30%),
+          linear-gradient(160deg, rgba(255,255,255,0.9), rgba(234, 228, 216, 0.92));
       }}
       .stat-value {{
         display: block;
@@ -804,7 +928,7 @@ def render_index(documents: Iterable[Document]) -> str:
         border: 1px solid rgba(36, 32, 28, 0.08);
       }}
       .doc-link:hover {{
-        border-color: rgba(140, 95, 43, 0.28);
+        border-color: rgba(86, 115, 58, 0.28);
         background: rgba(255, 255, 255, 0.94);
       }}
       .doc-title {{
@@ -857,6 +981,17 @@ def render_index(documents: Iterable[Document]) -> str:
         .hero, .group {{
           padding: 22px 18px;
         }}
+        .hero {{
+          grid-template-columns: 1fr;
+        }}
+        .hero-visual {{
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }}
+        .hero-frame-large,
+        .hero-frame-mini {{
+          min-height: 220px;
+        }}
         .stats {{
           grid-template-columns: 1fr;
         }}
@@ -876,13 +1011,23 @@ def render_index(documents: Iterable[Document]) -> str:
   <body>
     <div class="page-shell">
       <header class="hero">
-        <div class="eyebrow">Publicação estática</div>
-        <h1>Manuais do e-Cidade</h1>
-        <p class="lead">Catálogo gerado automaticamente a partir dos arquivos originais do repositório. Cada item tem uma página HTML de leitura e um link direto para download.</p>
-        <div class="stats" aria-label="Resumo do catálogo">
-          <div class="stat"><span class="stat-value">{total}</span><span class="stat-label">arquivos publicados</span></div>
-          <div class="stat"><span class="stat-value">{len(by_group)}</span><span class="stat-label">grupos</span></div>
-          <div class="stat"><span class="stat-value">HTML</span><span class="stat-label">pronto para Pages</span></div>
+        <div class="hero-copy">
+          <div class="eyebrow">Publicação estática</div>
+          <h1>Manuais do e-Cidade</h1>
+          <p class="lead">Catálogo gerado automaticamente a partir dos arquivos originais do repositório. As miniaturas da capa usam imagens reais dos manuais para dar contexto visual imediato ao conjunto.</p>
+          <div class="stats" aria-label="Resumo do catálogo">
+            <div class="stat"><span class="stat-value">{total}</span><span class="stat-label">arquivos publicados</span></div>
+            <div class="stat"><span class="stat-value">{len(by_group)}</span><span class="stat-label">grupos</span></div>
+            <div class="stat"><span class="stat-value">HTML</span><span class="stat-label">pronto para Pages</span></div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="Miniaturas dos manuais">
+          <div class="hero-stack" style="grid-column: span 1;">
+            {"".join(featured_cards[:1])}
+          </div>
+          <div class="hero-stack" style="grid-column: span 1;">
+            {"".join(featured_cards[1:])}
+          </div>
         </div>
       </header>
       <main class="catalog">
