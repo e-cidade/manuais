@@ -179,6 +179,19 @@ def collect_style_flags(*roots: ET.Element) -> dict[str, StyleFlags]:
     return resolved
 
 
+def redact_dbseller(html_text: str) -> str:
+    replacements = [
+        (r"dbseller\.com\.br", "e-cidade.example"),
+        (r"DBSeller\s+Sistemas\s+Integrados", "e-Cidade"),
+        (r"DBSeller\s+Serviços\s+de\s+Informática\s+LTDA\.?", "e-Cidade"),
+        (r"\bDBSeller\b", "e-Cidade"),
+        (r"\bdbseller\b", "admin"),
+    ]
+    for pattern, replacement in replacements:
+        html_text = re.sub(pattern, replacement, html_text, flags=re.IGNORECASE)
+    return html_text
+
+
 def preview_image_for(doc: Document) -> Path | None:
     candidates = sorted(doc.preview.parent.glob("*.png"))
     if not candidates:
@@ -338,6 +351,7 @@ def convert_pdf(doc: Document) -> None:
         1,
     )
     html_text = html_text.replace("</body>", "      </main>\n    </div>\n  </body>", 1)
+    html_text = redact_dbseller(html_text)
     doc.preview.write_text(html_text, encoding="utf-8")
 
 
@@ -519,6 +533,7 @@ def convert_odt(doc: Document) -> None:
     if body is None:
         raise RuntimeError(f"ODT body not found: {doc.source}")
     body_html = _render_odt_blocks(body, ns, style_flags)
+    body_html = redact_dbseller(body_html)
     page = f"""<!doctype html>
 <html lang="pt-br">
   <head>
